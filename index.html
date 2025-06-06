@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuraFlow CRM - Advanced Customer Relationship Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --aurora-gradient: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --dark-glass: rgba(0, 0, 0, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --accent-blue: #4299e1;
+            --accent-purple: #9f7aea;
+            --accent-pink: #ed64a6;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(270deg, #0f0f23, #1a1a2e, #16213e, #0f0f23);
+            background-size: 800% 800%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Background Canvas */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        }
+
+        /* Clay Morphism */
+        .clay {
+            background: linear-gradient(145deg, #2a2a3e, #1e1e32);
+            border-radius: 25px;
+            box-shadow: 
+                15px 15px 30px rgba(0,0,0,0.5),
+                -15px -15px 30px rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        /* Navigation */
+        .navbar-custom {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--aurora-gradient);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: var(--primary-gradient);
+            color: white !important;
+        }
+
+        /* Magnetic Button Effect */
+        .magnetic {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .magnetic:hover {
+            transform: scale(1.05);
+        }
+
+        /* Tilt Effect */
+        .tilt {
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+
+        /* Cart Icon */
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Page Content */
+        .page-content {
+            min-height: calc(100vh - 100px);
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        .page-section {
+            display: none;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .dashboard-card:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: var(--clay);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--aurora-gradient);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 15px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        /* Forms */
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Tables */
+        .table-custom {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .table-custom th {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table-custom td {
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Modals */
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            color: white;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes glitch {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
+            100% { transform: translateX(0); }
+        }
+
+        .glitch {
+            animation: glitch 0.3s ease-in-out;
+        }
+
+        /* Text Scramble */
+        .scramble {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Progress Bars */
+        .progress-custom {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-custom {
+            background: var(--aurora-gradient);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        /* Loading States */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                background: rgba(15, 15, 35, 0.95);
+                backdrop-filter: blur(20px);
+                border-radius: 20px;
+                margin-top: 1rem;
+                padding: 1rem;
+            }
+
+            .dashboard-card {
+                padding: 1rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Notification Toast */
+        .toast-custom {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            color: white;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Cart Styles */
+        .cart-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .cart-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Payment Form */
+        .card-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .card-preview {
+            background: var(--primary-gradient);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .card-preview:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+
+        .card-chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Typewriter Effect */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--accent-blue);
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--accent-blue); }
+        }
+
+        /* Floating Animation */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Hidden class for page transitions */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Success/Error States */
+        .success {
+            color: var(--success);
+        }
+
+        .error {
+            color: var(--danger);
+        }
+
+        .warning {
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Canvas -->
+    <canvas id="background-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showPage('dashboard')">
+                <i class="fas fa-brain me-2"></i>NeuraFlow CRM
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active magnetic" href="#" onclick="showPage('dashboard')">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link magnetic" href="#" onclick="showPage('contacts')">
+                            <i class="fas fa-users me-1"></i>Contacts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link magnetic" href="#" onclick="showPage('leads')">
+                            <i class="fas fa-chart-line me-1"></i>Leads & Deals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link magnetic" href="#" onclick="showPage('campaigns')">
+                            <i class="fas fa-bullhorn me-1"></i>Campaigns
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link magnetic" href="#" onclick="showPage('support')">
+                            <i class="fas fa-headset me-1"></i>Support
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link magnetic" href="#" onclick="showPage('reports')">
+                            <i class="fas fa-chart-bar me-1"></i>Reports
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item me-3">
+                        <a class="nav-link cart-icon magnetic" href="#" onclick="showPage('cart')">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge" id="cart-count">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle magnetic" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>Profile
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showPage('profile')">Settings</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid page-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page-section active">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h1 class="display-4 mb-3 typewriter">Welcome to NeuraFlow CRM</h1>
+                        <p class="lead mb-4">Your intelligent customer relationship management platform with AI-powered insights.</p>
+                    </div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="row mb-5">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card tilt magnetic">
+                            <div class="stat-number" id="total-contacts">1,247</div>
+                            <div class="stat-label">Total Contacts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card tilt magnetic">
+                            <div class="stat-number" id="active-deals">89</div>
+                            <div class="stat-label">Active Deals</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card tilt magnetic">
+                            <div class="stat-number" id="monthly-revenue">$125K</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card tilt magnetic">
+                            <div class="stat-number" id="conversion-rate">23%</div>
+                            <div class="stat-label">Conversion Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mb-5">
+                    <div class="col-lg-8 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Sales Performance</h3>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Lead Sources</h3>
+                            <div class="chart-container">
+                                <canvas id="leadChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Recent Contacts</h3>
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Company</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-contacts">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Quick Actions</h3>
+                            <div class="d-grid gap-3">
+                                <button class="btn btn-custom ripple magnetic" onclick="showAddContactModal()">
+                                    <i class="fas fa-user-plus me-2"></i>Add New Contact
+                                </button>
+                                <button class="btn btn-custom ripple magnetic" onclick="showPage('leads')">
+                                    <i class="fas fa-plus-circle me-2"></i>Create New Deal
+                                </button>
+                                <button class="btn btn-custom ripple magnetic" onclick="showPage('campaigns')">
+                                    <i class="fas fa-rocket me-2"></i>Launch Campaign
+                                </button>
+                                <button class="btn btn-custom ripple magnetic" onclick="addToCart('Premium CRM Plan', 99.99)">
+                                    <i class="fas fa-star me-2"></i>Upgrade to Premium
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Page -->
+        <div id="contacts" class="page-section">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="mb-3">Contact Management</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-custom magnetic" onclick="showAddContactModal()">
+                            <i class="fas fa-plus me-2"></i>Add Contact
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Search contacts..." id="contact-search">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-control" id="contact-filter">
+                            <option value="">All Contacts</option>
+                            <option value="lead">Leads</option>
+                            <option value="customer">Customers</option>
+                            <option value="partner">Partners</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Company</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contacts-table">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leads & Deals Page -->
+        <div id="leads" class="page-section">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="mb-3">Leads & Deals Pipeline</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-custom magnetic" onclick="showAddDealModal()">
+                            <i class="fas fa-plus me-2"></i>Add Deal
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="text-center mb-3">Prospects</h4>
+                            <div id="prospects-column" class="deals-column">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="text-center mb-3">Qualified</h4>
+                            <div id="qualified-column" class="deals-column">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="text-center mb-3">Proposal</h4>
+                            <div id="proposal-column" class="deals-column">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="text-center mb-3">Closed</h4>
+                            <div id="closed-column" class="deals-column">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaigns Page -->
+        <div id="campaigns" class="page-section">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="mb-3">Marketing Campaigns</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-custom magnetic" onclick="showCreateCampaignModal()">
+                            <i class="fas fa-plus me-2"></i>Create Campaign
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card campaign-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4>Email Newsletter</h4>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                            <p class="text-muted">Monthly product updates and industry insights</p>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Open Rate</span>
+                                    <span>24.5%</span>
+                                </div>
+                                <div class="progress-custom">
+                                    <div class="progress-bar-custom" style="width: 24.5%"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">Sent to 1,247 contacts</small>
+                                <button class="btn btn-sm btn-custom">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card campaign-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4>Product Launch</h4>
+                                <span class="badge bg-warning">Scheduled</span>
+                            </div>
+                            <p class="text-muted">Announcing our new AI-powered features</p>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Preparation</span>
+                                    <span>78%</span>
+                                </div>
+                                <div class="progress-custom">
+                                    <div class="progress-bar-custom" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">Launch in 5 days</small>
+                                <button class="btn btn-sm btn-custom">Edit Campaign</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card campaign-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4>Webinar Series</h4>
+                                <span class="badge bg-info">Draft</span>
+                            </div>
+                            <p class="text-muted">CRM best practices for growing businesses</p>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Content Ready</span>
+                                    <span>45%</span>
+                                </div>
+                                <div class="progress-custom">
+                                    <div class="progress-bar-custom" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">Draft created 2 days ago</small>
+                                <button class="btn btn-sm btn-custom">Continue Setup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Page -->
+        <div id="support" class="page-section">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="mb-3">Customer Support</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-custom magnetic" onclick="showCreateTicketModal()">
+                            <i class="fas fa-plus me-2"></i>Create Ticket
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">23</div>
+                            <div class="stat-label">Open Tickets</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Resolved Today</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">2.3h</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">98%</div>
+                            <div class="stat-label">Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3 class="mb-3">Recent Support Tickets</h3>
+                    <div class="table-responsive">
+                        <table class="table table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Customer</th>
+                                    <th>Subject</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="support-tickets">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page-section">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h2 class="mb-3">Analytics & Reports</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-custom magnetic" onclick="generateReport()">
+                            <i class="fas fa-download me-2"></i>Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Revenue Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Customer Segments</h3>
+                            <div class="chart-container">
+                                <canvas id="segmentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Top Performing Products</h3>
+                            <div class="chart-container">
+                                <canvas id="productChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Conversion Funnel</h3>
+                            <div class="chart-container">
+                                <canvas id="funnelChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Page -->
+        <div id="cart" class="page-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <h2 class="mb-4">Shopping Cart</h2>
+                        <div id="cart-items">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="dashboard-card">
+                            <h3 class="mb-3">Order Summary</h3>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="cart-subtotal">$0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax:</span>
+                                <span id="cart-tax">$0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Total:</strong>
+                                <strong id="cart-total">$0.00</strong>
+                            </div>
+                            <button class="btn btn-custom w-100 magnetic" onclick="showCheckout()">
+                                <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="page-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="dashboard-card text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-user-circle" style="font-size: 5rem; color: var(--accent-blue);"></i>
+                            </div>
+                            <h3>John Doe</h3>
+                            <p class="text-muted">Sales Manager</p>
+                            <button class="btn btn-custom">Change Avatar</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="dashboard-card">
+                            <h3 class="mb-4">Profile Settings</h3>
+                            <form>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" value="John">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" value="Doe">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="john.doe@example.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" value="+1 (555) 123-4567">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Department</label>
+                                    <select class="form-control">
+                                        <option>Sales</option>
+                                        <option>Marketing</option>
+                                        <option>Support</option>
+                                        <option>Management</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-custom">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Contact Modal -->
+    <div class="modal fade" id="addContactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactForm">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="contactName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="contactEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Company</label>
+                            <input type="text" class="form-control" id="contactCompany">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="contactPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-control" id="contactStatus">
+                                <option value="lead">Lead</option>
+                                <option value="customer">Customer</option>
+                                <option value="partner">Partner</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-custom" onclick="addContact()">Add Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Secure Checkout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Payment Information</h6>
+                            <div class="card-preview mb-4">
+                                <div class="card-chip"></div>
+                                <div class="card-number" id="preview-card-number">•••• •••• •••• ••••</div>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div style="font-size: 0.8rem; opacity: 0.7;">CARD HOLDER</div>
+                                        <div id="preview-card-name">JOHN DOE</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.8rem; opacity: 0.7;">EXPIRES</div>
+                                        <div id="preview-card-expiry">••/••</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <form id="paymentForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="card-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Card Holder Name</label>
+                                    <input type="text" class="card-input" id="cardName" placeholder="John Doe">
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Expiry Date</label>
+                                            <input type="text" class="card-input" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">CVV</label>
+                                            <input type="text" class="card-input" id="cardCvv" placeholder="123" maxlength="3">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-custom" onclick="processPayment()">
+                        <i class="fas fa-lock me-2"></i>Pay Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notification-toast" class="toast toast-custom" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong class="me-auto">NeuraFlow CRM</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toast-message">
+                <!-- Message content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page (Initially Hidden) -->
+    <div id="login-page" class="login-container hidden">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <h2 class="mb-3">Welcome Back</h2>
+                <p class="text-muted">Sign in to your NeuraFlow CRM account</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" required>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                </div>
+                <button type="submit" class="btn btn-custom w-100 mb-3">Sign In</button>
+                <div class="text-center">
+                    <a href="#" class="text-decoration-none">Forgot your password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Global Variables
+        let currentPage = 'dashboard';
+        let cartItems = [];
+        let contacts = [];
+        let deals = [];
+        let isLoggedIn = true;
+
+        // Sample Data
+        const sampleContacts = [
+            { id: 1, name: 'Alice Johnson', email: 'alice@techcorp.com', company: 'TechCorp', phone: '+1-555-0101', status: 'customer' },
+            { id: 2, name: 'Bob Smith', email: 'bob@startup.io', company: 'StartupIO', phone: '+1-555-0102', status: 'lead' },
+            { id: 3, name: 'Carol Davis', email: 'carol@enterprise.com', company: 'Enterprise Co', phone: '+1-555-0103', status: 'partner' },
+            { id: 4, name: 'David Wilson', email: 'david@innovation.net', company: 'Innovation Net', phone: '+1-555-0104', status: 'customer' },
+            { id: 5, name: 'Eva Martinez', email: 'eva@solutions.org', company: 'Solutions Org', phone: '+1-555-0105', status: 'lead' }
+        ];
+
+        const sampleDeals = [
+            { id: 1, title: 'Enterprise CRM Package', company: 'TechCorp', value: 25000, stage: 'qualified' },
+            { id: 2, title: 'Startup Plan Upgrade', company: 'StartupIO', value: 5000, stage: 'prospects' },
+            { id: 3, title: 'Custom Integration', company: 'Enterprise Co', value: 45000, stage: 'proposal' },
+            { id: 4, title: 'Annual Subscription', company: 'Innovation Net', value: 12000, stage: 'closed' }
+        ];
+
+        const sampleTickets = [
+            { id: 'TK-001', customer: 'Alice Johnson', subject: 'Login Issues', priority: 'High', status: 'Open', created: '2 hours ago' },
+            { id: 'TK-002', customer: 'Bob Smith', subject: 'Feature Request', priority: 'Medium', status: 'In Progress', created: '1 day ago' },
+            { id: 'TK-003', customer: 'Carol Davis', subject: 'Data Export', priority: 'Low', status: 'Resolved', created: '3 days ago' }
+        ];
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isLoggedIn) {
+                initializeApp();
+            } else {
+                showLoginPage();
+            }
+        });
+
+        function initializeApp() {
+            initializeBackground();
+            initializeData();
+            initializeCharts();
+            initializeEventListeners();
+            updateDashboard();
+            
+            // Initialize animations
+            gsap.from('.stat-card', {
+                duration: 1,
+                y: 50,
+                opacity: 0,
+                stagger: 0.2
+            });
+        }
+
+        function initializeBackground() {
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2 + 1,
+                    opacity: Math.random() * 0.5 + 0.2
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+                    if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+                    
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(102, 126, 234, ${particle.opacity})`;
+                    ctx.fill();
+                });
+                
+                // Connect nearby particles
+                particles.forEach((p1, i) => {
+                    particles.slice(i + 1).forEach(p2 => {
+                        const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = `rgba(102, 126, 234, ${0.1 * (1 - distance / 100)})`;
+                            ctx.stroke();
+                        }
+                    });
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        function initializeData() {
+            contacts = [...sampleContacts];
+            deals = [...sampleDeals];
+            updateContactsTable();
+            updateDealsView();
+            updateSupportTickets();
+        }
+
+        function initializeCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart');
+            if (salesCtx) {
+                new Chart(salesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [65000, 78000, 82000, 94000, 108000, 125000],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'rgba(255,255,255,0.7)' } },
+                            y: { ticks: { color: 'rgba(255,255,255,0.7)' } }
+                        }
+                    }
+                });
+            }
+
+            // Lead Sources Chart
+            const leadCtx = document.getElementById('leadChart');
+            if (leadCtx) {
+                new Chart(leadCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Website', 'Social Media', 'Email', 'Referrals'],
+                        datasets: [{
+                            data: [40, 25, 20, 15],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Revenue Chart (Reports page)
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [250000, 320000, 390000, 450000],
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'rgba(255,255,255,0.7)' } },
+                            y: { ticks: { color: 'rgba(255,255,255,0.7)' } }
+                        }
+                    }
+                });
+            }
+
+            // Customer Segments Chart
+            const segmentCtx = document.getElementById('segmentChart');
+            if (segmentCtx) {
+                new Chart(segmentCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Enterprise', 'SMB', 'Startup', 'Individual'],
+                        datasets: [{
+                            data: [35, 30, 25, 10],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: 'white' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initializeEventListeners() {
+            // Magnetic effect for buttons
+            document.querySelectorAll('.magnetic').forEach(element => {
+                element.addEventListener('mousemove', (e) => {
+                    const rect = element.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    element.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    element.style.transform = '';
+                });
+            });
+
+            // Tilt effect
+            document.querySelectorAll('.tilt').forEach(element => {
+                element.addEventListener('mousemove', (e) => {
+                    const rect = element.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    
+                    element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    element.style.transform = '';
+                });
+            });
+
+            // Card input formatting
+            document.getElementById('cardNumber')?.addEventListener('input', formatCardNumber);
+            document.getElementById('cardExpiry')?.addEventListener('input', formatExpiry);
+            document.getElementById('cardName')?.addEventListener('input', updateCardPreview);
+            
+            // Search functionality
+            document.getElementById('contact-search')?.addEventListener('input', filterContacts);
+            document.getElementById('contact-filter')?.addEventListener('change', filterContacts);
+        }
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                currentPage = pageId;
+                
+                // Trigger page-specific animations
+                gsap.from(targetPage.children, {
+                    duration: 0.8,
+                    y: 30,
+                    opacity: 0,
+                    stagger: 0.1
+                });
+            }
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            animateNumbers();
+            updateRecentContacts();
+        }
+
+        function animateNumbers() {
+            const stats = [
+                { id: 'total-contacts', target: 1247 },
+                { id: 'active-deals', target: 89 },
+                { id: 'conversion-rate', target: 23, suffix: '%' }
+            ];
+            
+            stats.forEach(stat => {
+                const element = document.getElementById(stat.id);
+                if (element) {
+                    gsap.to({ value: 0 }, {
+                        duration: 2,
+                        value: stat.target,
+                        ease: "power2.out",
+                        onUpdate: function() {
+                            element.textContent = Math.floor(this.targets()[0].value) + (stat.suffix || '');
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateRecentContacts() {
+            const tableBody = document.getElementById('recent-contacts');
+            if (tableBody) {
+                tableBody.innerHTML = contacts.slice(0, 5).map(contact => `
+                    <tr>
+                        <td>${contact.name}</td>
+                        <td>${contact.company}</td>
+                        <td><span class="badge bg-${getStatusColor(contact.status)}">${contact.status}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Contact Management
+        function updateContactsTable() {
+            const tableBody = document.getElementById('contacts-table');
+            if (tableBody) {
+                tableBody.innerHTML = contacts.map(contact => `
+                    <tr>
+                        <td>${contact.name}</td>
+                        <td>${contact.email}</td>
+                        <td>${contact.company}</td>
+                        <td>${contact.phone}</td>
+                        <td><span class="badge bg-${getStatusColor(contact.status)}">${contact.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-light me-1" onclick="editContact(${contact.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteContact(${contact.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function filterContacts() {
+            const search = document.getElementById('contact-search')?.value.toLowerCase() || '';
+            const filter = document.getElementById('contact-filter')?.value || '';
+            
+            const filtered = contacts.filter(contact => {
+                const matchesSearch = contact.name.toLowerCase().includes(search) ||
+                                    contact.email.toLowerCase().includes(search) ||
+                                    contact.company.toLowerCase().includes(search);
+                const matchesFilter = !filter || contact.status === filter;
+                
+                return matchesSearch && matchesFilter;
+            });
+            
+            // Update table with filtered results
+            const tableBody = document.getElementById('contacts-table');
+            if (tableBody) {
+                tableBody.innerHTML = filtered.map(contact => `
+                    <tr>
+                        <td>${contact.name}</td>
+                        <td>${contact.email}</td>
+                        <td>${contact.company}</td>
+                        <td>${contact.phone}</td>
+                        <td><span class="badge bg-${getStatusColor(contact.status)}">${contact.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-light me-1" onclick="editContact(${contact.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteContact(${contact.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function showAddContactModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addContactModal'));
+            modal.show();
+        }
+
+        function addContact() {
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const company = document.getElementById('contactCompany').value;
+            const phone = document.getElementById('contactPhone').value;
+            const status = document.getElementById('contactStatus').value;
+            
+            if (name && email) {
+                const newContact = {
+                    id: Date.now(),
+                    name,
+                    email,
+                    company,
+                    phone,
+                    status
+                };
+                
+                contacts.unshift(newContact);
+                updateContactsTable();
+                updateRecentContacts();
+                
+                // Close modal and reset form
+                bootstrap.Modal.getInstance(document.getElementById('addContactModal')).hide();
+                document.getElementById('contactForm').reset();
+                
+                showToast('Contact added successfully!', 'success');
+                
+                // Animate new row
+                gsap.from('#contacts-table tr:first-child', {
+                    duration: 0.5,
+                    x: -50,
+                    opacity: 0
+                });
+            }
+        }
+
+        // Deals Management
+        function updateDealsView() {
+            const stages = ['prospects', 'qualified', 'proposal', 'closed'];
+            
+            stages.forEach(stage => {
+                const column = document.getElementById(`${stage}-column`);
+                if (column) {
+                    const stageDeals = deals.filter(deal => deal.stage === stage);
+                    column.innerHTML = stageDeals.map(deal => `
+                        <div class="deal-card mb-3 p-3" style="background: var(--glass-bg); border-radius: 15px; border: 1px solid var(--glass-border);">
+                            <h6>${deal.title}</h6>
+                            <p class="text-muted mb-1">${deal.company}</p>
+                            <p class="mb-0"><strong>$${deal.value.toLocaleString()}</strong></p>
+                        </div>
+                    `).join('');
+                }
+            });
+        }
+
+        // Support Tickets
+        function updateSupportTickets() {
+            const tableBody = document.getElementById('support-tickets');
+            if (tableBody) {
+                tableBody.innerHTML = sampleTickets.map(ticket => `
+                    <tr>
+                        <td>${ticket.id}</td>
+                        <td>${ticket.customer}</td>
+                        <td>${ticket.subject}</td>
+                        <td><span class="badge bg-${getPriorityColor(ticket.priority)}">${ticket.priority}</span></td>
+                        <td><span class="badge bg-${getTicketStatusColor(ticket.status)}">${ticket.status}</span></td>
+                        <td>${ticket.created}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Cart Management
+        function addToCart(itemName, price) {
+            const existingItem = cartItems.find(item => item.name === itemName);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cartItems.push({
+                    id: Date.now(),
+                    name: itemName,
+                    price: price,
+                    quantity: 1
+                });
+            }
+            
+            updateCartDisplay();
+            showToast(`${itemName} added to cart!`, 'success');
+            
+            // Animate cart icon
+            const cartIcon = document.querySelector('.cart-icon');
+            gsap.to(cartIcon, {
+                duration: 0.3,
+                scale: 1.2,
+                yoyo: true,
+                repeat: 1
+            });
+        }
+
+        function updateCartDisplay() {
+            const cartCount = document.getElementById('cart-count');
+            const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            const cartItemsContainer = document.getElementById('cart-items');
+            if (cartItemsContainer) {
+                if (cartItems.length === 0) {
+                    cartItemsContainer.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+                            <h4>Your cart is empty</h4>
+                            <p class="text-muted">Add some items to get started</p>
+                        </div>
+                    `;
+                } else {
+                    cartItemsContainer.innerHTML = cartItems.map(item => `
+                        <div class="cart-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">${item.name}</h5>
+                                    <p class="text-muted mb-0">$${item.price.toFixed(2)} each</p>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-outline-light me-2" onclick="updateQuantity(${item.id}, -1)">-</button>
+                                    <span class="me-2">${item.quantity}</span>
+                                    <button class="btn btn-sm btn-outline-light me-3" onclick="updateQuantity(${item.id}, 1)">+</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            updateCartSummary();
+        }
+
+        function updateCartSummary() {
+            const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.08; // 8% tax
+            const total = subtotal + tax;
+            
+            document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function updateQuantity(itemId, change) {
+            const item = cartItems.find(item => item.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function removeFromCart(itemId) {
+            cartItems = cartItems.filter(item => item.id !== itemId);
+            updateCartDisplay();
+            showToast('Item removed from cart', 'info');
+        }
+
+        // Checkout and Payment
+        function showCheckout() {
+            if (cartItems.length === 0) {
+                showToast('Your cart is empty!', 'warning');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+            modal.show();
+        }
+
+        function formatCardNumber(event) {
+            let value = event.target.value.replace(/\s/g, '').replace(/\D/g, '');
+            let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+            
+            if (formattedValue.length > 19) {
+                formattedValue = formattedValue.substring(0, 19);
+            }
+            
+            event.target.value = formattedValue;
+            document.getElementById('preview-card-number').textContent = formattedValue || '•••• •••• •••• ••••';
+        }
+
+        function formatExpiry(event) {
+            let value = event.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            event.target.value = value;
+            document.getElementById('preview-card-expiry').textContent = value || '••/••';
+        }
+
+        function updateCardPreview() {
+            const name = document.getElementById('cardName').value.toUpperCase() || 'JOHN DOE';
+            document.getElementById('preview-card-name').textContent = name;
+        }
+
+        function processPayment() {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardName = document.getElementById('cardName').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCvv = document.getElementById('cardCvv').value;
+            
+            if (!cardNumber || !cardName || !cardExpiry || !cardCvv) {
+                showToast('Please fill in all payment details', 'error');
+                return;
+            }
+            
+            // Simulate payment processing
+            showToast('Processing payment...', 'info');
+            
+            setTimeout(() => {
+                // Clear cart
+                cartItems = [];
+                updateCartDisplay();
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+                
+                // Show success
+                showToast('Payment successful! Thank you for your purchase.', 'success');
+                
+                // Reset form
+                document.getElementById('paymentForm').reset();
+                document.getElementById('preview-card-number').textContent = '•••• •••• •••• ••••';
+                document.getElementById('preview-card-name').textContent = 'JOHN DOE';
+                document.getElementById('preview-card-expiry').textContent = '••/••';
+                
+                // Confetti effect
+                createConfetti();
+            }, 2000);
+        }
+
+        // Utility Functions
+        function getStatusColor(status) {
+            const colors = {
+                'lead': 'warning',
+                'customer': 'success',
+                'partner': 'info'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'High': 'danger',
+                'Medium': 'warning',
+                'Low': 'success'
+            };
+            return colors[priority] || 'secondary';
+        }
+
+        function getTicketStatusColor(status) {
+            const colors = {
+                'Open': 'danger',
+                'In Progress': 'warning',
+                'Resolved': 'success'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('notification-toast');
+            const toastBody = document.getElementById('toast-message');
+            
+            toastBody.textContent = message;
+            
+            // Update toast styling based on type
+            toast.className = `toast toast-custom show`;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = ['#ff006e', '#8338ec', '#3a86ff', '#06ffa5', '#ffbe0b'][Math.floor(Math.random() * 5)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.zIndex = '9999';
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                gsap.to(confetti, {
+                    duration: 3,
+                    y: window.innerHeight + 100,
+                    rotation: 360,
+                    opacity: 0,
+                    onComplete: () => {
+                        document.body.removeChild(confetti);
+                    }
+                });
+            }
+        }
+
+        function generateReport() {
+            showToast('Generating report...', 'info');
+            
+            setTimeout(() => {
+                showToast('Report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            showLoginPage();
+        }
+
+        function showLoginPage() {
+            document.querySelector('.navbar-custom').style.display = 'none';
+            document.querySelector('.page-content').style.display = 'none';
+            document.getElementById('login-page').classList.remove('hidden');
+            
+            // Add login form handler
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                isLoggedIn = true;
+                document.querySelector('.navbar-custom').style.display = 'block';
+                document.querySelector('.page-content').style.display = 'block';
+                document.getElementById('login-page').classList.add('hidden');
+                showPage('dashboard');
+                showToast('Welcome back!', 'success');
+            });
+        }
+
+        // Text Scramble Effect
+        function scrambleText(element, finalText) {
+            const chars = '!<>-_\\/[]{}—=+*^?#________';
+            let iteration = 0;
+            
+            const interval = setInterval(() => {
+                element.innerText = finalText
+                    .split('')
+                    .map((letter, index) => {
+                        if (index < iteration) {
+                            return finalText[index];
+                        }
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join('');
+                
+                if (iteration >= finalText.length) {
+                    clearInterval(interval);
+                }
+                
+                iteration += 1 / 3;
+            }, 30);
+        }
+
+        // Initialize the application
+        window.addEventListener('load', initializeApp);
+
+        // Add some sample products to demonstrate cart functionality
+        setTimeout(() => {
+            const products = [
+                { name: 'Basic CRM Plan', price: 29.99 },
+                { name: 'Professional CRM Plan', price: 59.99 },
+                { name: 'Enterprise CRM Plan', price: 99.99 },
+                { name: 'AI Analytics Add-on', price: 19.99 },
+                { name: 'Advanced Reporting', price: 39.99 }
+            ];
+            
+            // You can add these to product showcase if needed
+            window.products = products;
+        }, 1000);
+    </script>
+</body>
+</html>
